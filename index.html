@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TWFE Panel Data Power & Sample Size Calculator</title>
+  <!-- Tailwind CSS for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js for interactive power/MDE curves -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- MathJax for rendering the econometric equation -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen p-4 md:p-8">
+
+  <div class="max-w-6xl mx-auto space-y-6">
+    <!-- Header & Model Specification -->
+    <header class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <h1 class="text-2xl font-bold text-slate-900">TWFE Panel Data Power & Linkage Calculator</h1>
+      <p class="text-sm text-slate-600 mt-1">
+        Sample size and Minimum Detectable Effect (MDE) evaluator for linked economic, energy, and environmental expenditure microdata panels.
+      </p>
+      <div class="mt-4 p-4 bg-slate-100 rounded-lg text-center overflow-x-auto">
+        <span class="text-sm md:text-base font-medium">
+          $$\ln(Y_{it}) = \beta_1 \text{CleanTech}_{it} + \beta_2 \ln(E_{it}) + \beta_3 \ln(L_{it}) + \beta_4 \ln(K_{it}) + \alpha_i + \gamma_{jt} + \epsilon_{it}$$
+        </span>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Controls Panel -->
+      <div class="lg:col-span-5 bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
+        <h2 class="text-lg font-semibold text-slate-900 border-b pb-2">Model & Survey Parameters</h2>
+
+        <!-- Target MDE -->
+        <div>
+          <div class="flex justify-between text-sm font-medium">
+            <label for="mde">Target MDE ($\beta_1$, % Change in $Y$)</label>
+            <span id="mde_val" class="text-blue-600 font-bold">2.0%</span>
+          </div>
+          <input id="mde" type="range" min="0.005" max="0.10" step="0.0025" value="0.02" class="w-full mt-1 accent-blue-600">
+          <div class="flex justify-between text-xs text-slate-400"><span>0.5%</span><span>5.0%</span><span>10.0%</span></div>
+        </div>
+
+        <!-- Treatment Proportion -->
+        <div>
+          <div class="flex justify-between text-sm font-medium">
+            <label for="prop">CleanTech Treatment Share ($p$)</label>
+            <span id="prop_val" class="text-blue-600 font-bold">10%</span>
+          </div>
+          <input id="prop" type="range" min="0.02" max="0.50" step="0.01" value="0.10" class="w-full mt-1 accent-blue-600">
+          <div class="flex justify-between text-xs text-slate-400"><span>2%</span><span>25%</span><span>50%</span></div>
+        </div>
+
+        <!-- Baseline Variance -->
+        <div>
+          <div class="flex justify-between text-sm font-medium">
+            <label for="sigma2">Baseline Unconditional Variance ($\sigma^2_{\ln Y}$)</label>
+            <span id="sigma2_val" class="text-blue-600 font-bold">0.25</span>
+          </div>
+          <input id="sigma2" type="range" min="0.05" max="1.00" step="0.05" value="0.25" class="w-full mt-1 accent-blue-600">
+        </div>
+
+        <!-- R-Squared -->
+        <div>
+          <div class="flex justify-between text-sm font-medium">
+            <label for="r2">Variance Explained by $E, L, K$ & FEs ($R^2$)</label>
+            <span id="r2_val" class="text-blue-600 font-bold">60%</span>
+          </div>
+          <input id="r2" type="range" min="0.10" max="0.90" step="0.05" value="0.60" class="w-full mt-1 accent-blue-600">
+        </div>
+
+        <!-- Panel Length (T) -->
+        <div>
+          <div class="flex justify-between text-sm font-medium">
+            <label for="years">Balanced Panel Horizon ($T$ Years)</label>
+            <span id="years_val" class="text-blue-600 font-bold">7</span>
+          </div>
+          <input id="years" type="range" min="2" max="15" step="1" value="7" class="w-full mt-1 accent-blue-600">
+        </div>
+
+        <!-- Serial Correlation (rho) -->
+        <div>
+          <div class="flex justify-between text-sm font-medium">
+            <label for="rho">Within-Firm Residual Autocorrelation ($\rho$)</label>
+            <span id="rho_val" class="text-blue-600 font-bold">0.30</span>
+          </div>
+          <input id="rho" type="range" min="0.00" max="0.80" step="0.05" value="0.30" class="w-full mt-1 accent-blue-600">
+        </div>
+
+        <!-- Number of Industries (J) -->
+        <div class="grid grid-cols-3 gap-3 pt-2 border-t">
+          <div>
+            <label class="block text-xs font-medium text-slate-600">Industries ($J$)</label>
+            <input id="ind" type="number" value="21" min="1" max="100" class="mt-1 w-full rounded border-slate-300 border p-1.5 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600">Alpha ($\alpha$)</label>
+            <select id="alpha" class="mt-1 w-full rounded border-slate-300 border p-1.5 text-sm">
+              <option value="0.01">0.01 (99%)</option>
+              <option value="0.05" selected>0.05 (95%)</option>
+              <option value="0.10">0.10 (90%)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600">Power ($1-\beta$)</label>
+            <select id="power" class="mt-1 w-full rounded border-slate-300 border p-1.5 text-sm">
+              <option value="0.80" selected>0.80 (80%)</option>
+              <option value="0.90">0.90 (90%)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outputs & Visualization Panel -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <div class="text-xs text-slate-500 uppercase font-semibold">Clustered Obs ($N$)</div>
+            <div id="out_n_clustered" class="text-2xl font-bold text-blue-700 mt-1">--</div>
+            <div class="text-xs text-slate-400 mt-1">Total firm-year rows</div>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <div class="text-xs text-slate-500 uppercase font-semibold">Balanced Firms ($N_i$)</div>
+            <div id="out_firms" class="text-2xl font-bold text-emerald-700 mt-1">--</div>
+            <div class="text-xs text-slate-400 mt-1">Unique linked units</div>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <div class="text-xs text-slate-500 uppercase font-semibold">Design Effect</div>
+            <div id="out_deff" class="text-2xl font-bold text-amber-600 mt-1">--</div>
+            <div class="text-xs text-slate-400 mt-1">$1 + (T-1)\rho$ multiplier</div>
+          </div>
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <div class="text-xs text-slate-500 uppercase font-semibold">Unclustered $N$</div>
+            <div id="out_n_unclustered" class="text-2xl font-bold text-slate-700 mt-1">--</div>
+            <div class="text-xs text-slate-400 mt-1">Assuming $\rho = 0$</div>
+          </div>
+        </div>
+
+        <!-- Reference Table for 1%, 2%, 5% MDE -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h3 class="text-sm font-semibold text-slate-800 uppercase tracking-wider mb-3">Benchmark Thresholds (1%, 2%, and 5% MDE)</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-slate-50 text-slate-600 border-b">
+                <tr>
+                  <th class="py-2 px-3">Target MDE ($\beta_1$)</th>
+                  <th class="py-2 px-3">Unadjusted Obs ($N$)</th>
+                  <th class="py-2 px-3">Clustered Obs ($N_{final}$)</th>
+                  <th class="py-2 px-3">Required Linked Firms ($N_i$)</th>
+                </tr>
+              </thead>
+              <tbody id="benchmark_table" class="divide-y"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h3 class="text-sm font-semibold text-slate-800 uppercase tracking-wider mb-3">Required Sample Size Curve Across MDEs</h3>
+          <canvas id="powerChart" height="190"></canvas>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Inverse Standard Normal Approximation (Beasley-Springer-Moro / Rational approx)
+    function normSInv(p) {
+      const a1 = -39.6968302866538, a2 = 220.946098424521, a3 = -275.928510446969;
+      const a4 = 138.357751867269, a5 = -30.6647980661472, a6 = 2.50662827745924;
+      const b1 = -54.4760987982241, b2 = 161.585836858041, b3 = -155.698979859887;
+      const b4 = 66.8013118877197, b5 = -13.2806815528857;
+      const q = p - 0.5;
+      const r = q * q;
+      return (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * q /
+             (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1);
+    }
+
+    let chartInstance = null;
+
+    function computeSampleSize(mde, p, sigma2, r2, T, rho, J, alpha, power) {
+      const zAlpha = normSInv(1 - alpha / 2);
+      const zBeta = normSInv(power);
+      const multiplier = Math.pow(zAlpha + zBeta, 2);
+      const resVar = sigma2 * (1 - r2);
+      const treatVar = p * (1 - p);
+
+      // Core sample size before DF & clustering
+      const baseN = (multiplier * resVar) / (treatVar * Math.pow(mde, 2));
+
+      // Fixed Effects DF: Industry x Year (J*T) + 4 covariates (CleanTech, E, L, K)
+      // Note: In a balanced panel of T years, absorbing firm FE consumes 1/T of total observations
+      // Solving N_unadj = baseN / (1 - 1/T) + J*T + 4 accounts for within-firm demeaning DF loss
+      const dfFixed = (J * T) + 4;
+      const unclusteredN = Math.ceil((baseN + dfFixed) / (1 - (1 / T)));
+
+      // Design Effect (DEFF) for firm-level clustering over T periods
+      const deff = 1 + (T - 1) * rho;
+      const clusteredN = Math.ceil(unclusteredN * deff);
+      const firms = Math.ceil(clusteredN / T);
+
+      return { unclusteredN, clusteredN, firms, deff };
+    }
+
+    function updateCalculator() {
+      const mde = parseFloat(document.getElementById('mde').value);
+      const p = parseFloat(document.getElementById('prop').value);
+      const sigma2 = parseFloat(document.getElementById('sigma2').value);
+      const r2 = parseFloat(document.getElementById('r2').value);
+      const T = parseInt(document.getElementById('years').value);
+      const rho = parseFloat(document.getElementById('rho').value);
+      const J = parseInt(document.getElementById('ind').value) || 21;
+      const alpha = parseFloat(document.getElementById('alpha').value);
+      const power = parseFloat(document.getElementById('power').value);
+
+      // Update UI Labels
+      document.getElementById('mde_val').innerText = (mde * 100).toFixed(2) + '%';
+      document.getElementById('prop_val').innerText = Math.round(p * 100) + '%';
+      document.getElementById('sigma2_val').innerText = sigma2.toFixed(2);
+      document.getElementById('r2_val').innerText = Math.round(r2 * 100) + '%';
+      document.getElementById('years_val').innerText = T;
+      document.getElementById('rho_val').innerText = rho.toFixed(2);
+
+      const res = computeSampleSize(mde, p, sigma2, r2, T, rho, J, alpha, power);
+
+      document.getElementById('out_n_clustered').innerText = res.clusteredN.toLocaleString();
+      document.getElementById('out_firms').innerText = res.firms.toLocaleString();
+      document.getElementById('out_deff').innerText = res.deff.toFixed(2) + 'x';
+      document.getElementById('out_n_unclustered').innerText = res.unclusteredN.toLocaleString();
+
+      // Update Benchmark Table (1%, 2%, 5%)
+      const benchmarks = [0.01, 0.02, 0.05];
+      const tbody = document.getElementById('benchmark_table');
+      tbody.innerHTML = '';
+      benchmarks.forEach(b => {
+        const bRes = computeSampleSize(b, p, sigma2, r2, T, rho, J, alpha, power);
+        const row = `<tr class="hover:bg-slate-50">
+          <td class="py-2 px-3 font-semibold text-slate-900">${(b * 100).toFixed(0)}% Effect</td>
+          <td class="py-2 px-3 text-slate-600">${bRes.unclusteredN.toLocaleString()}</td>
+          <td class="py-2 px-3 font-bold text-blue-700">${bRes.clusteredN.toLocaleString()}</td>
+          <td class="py-2 px-3 font-semibold text-emerald-700">${bRes.firms.toLocaleString()} firms</td>
+        </tr>`;
+        tbody.insertAdjacentHTML('beforeend', row);
+      });
+
+      // Update Chart
+      const mdeGrid = [];
+      const clusteredSeries = [];
+      const unclusteredSeries = [];
+      for (let m = 0.01; m <= 0.08; m += 0.005) {
+        mdeGrid.push((m * 100).toFixed(1) + '%');
+        const cRes = computeSampleSize(m, p, sigma2, r2, T, rho, J, alpha, power);
+        clusteredSeries.push(cRes.clusteredN);
+        unclusteredSeries.push(cRes.unclusteredN);
+      }
+
+      if (chartInstance) {
+        chartInstance.data.labels = mdeGrid;
+        chartInstance.data.datasets[0].data = clusteredSeries;
+        chartInstance.data.datasets[1].data = unclusteredSeries;
+        chartInstance.update();
+      } else {
+        const ctx = document.getElementById('powerChart').getContext('2d');
+        chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: mdeGrid,
+            datasets: [
+              {
+                label: 'Clustered Required N (With Serial Correlation)',
+                data: clusteredSeries,
+                borderColor: '#1d4ed8',
+                backgroundColor: 'rgba(29, 78, 216, 0.1)',
+                fill: true,
+                tension: 0.3
+              },
+              {
+                label: 'Unclustered Baseline N (rho = 0)',
+                data: unclusteredSeries,
+                borderColor: '#64748b',
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0.3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } },
+            scales: {
+              y: { title: { display: true, text: 'Required Total Observations (N)' } },
+              x: { title: { display: true, text: 'Minimum Detectable Effect (MDE)' } }
+            }
+          }
+        });
+      }
+    }
+
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', updateCalculator);
+    });
+    window.addEventListener('DOMContentLoaded', updateCalculator);
+  </script>
+</body>
+</html>
