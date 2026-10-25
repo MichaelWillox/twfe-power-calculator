@@ -2,6 +2,8 @@
 
 This repository contains an interactive statistical power and sample size calculator for Two-Way Fixed Effects (TWFE) econometric regressions. It is specifically designed to evaluate linked economic, energy, and environmental expenditure microdata panels, illustrating the statistical constraints ("intersection penalties") of tracking firms over time.
 
+**[Launch the Interactive TWFE Power Calculator](https://michaelwillox.github.io/twfe-power-calculator/)**
+
 ## Key Abbreviations
 * **TWFE (Two-Way Fixed Effects):** An econometric panel data model that controls for both unobserved unit-specific traits (e.g., firm fixed effects) and time-specific shocks (e.g., year fixed effects).
 * **MDE (Minimum Detectable Effect):** The smallest true causal effect size (here, $\beta_1$) that the study is statistically powered to detect reliably without mistaking background noise for a real impact.
