@@ -125,22 +125,26 @@
         <!-- KPI Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-            <div class="text-xs text-slate-500 uppercase font-semibold">Clustered Obs ($N$)</div>
+            <div class="text-xs text-slate-500 uppercase font-semibold">Clustered Obs</div>
+            <div class="text-[11px] text-slate-400 font-medium">($N$)</div>
             <div id="out_n_clustered" class="text-2xl font-bold text-blue-700 mt-1">--</div>
             <div class="text-xs text-slate-400 mt-1">Total firm-year rows</div>
           </div>
           <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-            <div class="text-xs text-slate-500 uppercase font-semibold">Balanced Firms ($N_i$)</div>
+            <div class="text-xs text-slate-500 uppercase font-semibold">Balanced Firms</div>
+            <div class="text-[11px] text-slate-400 font-medium">($N_i$)</div>
             <div id="out_firms" class="text-2xl font-bold text-emerald-700 mt-1">--</div>
             <div class="text-xs text-slate-400 mt-1">Unique linked units</div>
           </div>
           <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
             <div class="text-xs text-slate-500 uppercase font-semibold">Design Effect</div>
+            <div class="text-[11px] text-slate-400 font-medium">(DEFF)</div>
             <div id="out_deff" class="text-2xl font-bold text-amber-600 mt-1">--</div>
             <div class="text-xs text-slate-400 mt-1">$1 + (T-1)\rho$ multiplier</div>
           </div>
           <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-            <div class="text-xs text-slate-500 uppercase font-semibold">Unclustered $N$</div>
+            <div class="text-xs text-slate-500 uppercase font-semibold">Unclustered Obs</div>
+            <div class="text-[11px] text-slate-400 font-medium">($N_{baseline}$)</div>
             <div id="out_n_unclustered" class="text-2xl font-bold text-slate-700 mt-1">--</div>
             <div class="text-xs text-slate-400 mt-1">Assuming $\rho = 0$</div>
           </div>
@@ -148,15 +152,27 @@
 
         <!-- Reference Table for 1%, 2%, 5% MDE -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <h3 class="text-sm font-semibold text-slate-800 uppercase tracking-wider mb-3">Benchmark Thresholds (1%, 2%, and 5% MDE)</h3>
+          <h3 class="text-sm font-semibold text-slate-800 uppercase tracking-wider mb-3">Benchmark Thresholds</h3>
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
               <thead class="bg-slate-50 text-slate-600 border-b">
                 <tr>
-                  <th class="py-2 px-3">Target MDE ($\beta_1$)</th>
-                  <th class="py-2 px-3">Unadjusted Obs ($N$)</th>
-                  <th class="py-2 px-3">Clustered Obs ($N_{final}$)</th>
-                  <th class="py-2 px-3">Required Linked Firms ($N_i$)</th>
+                  <th class="py-2 px-3 align-top">
+                    <div>Target MDE</div>
+                    <div class="text-xs font-normal text-slate-400 mt-0.5">($\beta_1$)</div>
+                  </th>
+                  <th class="py-2 px-3 align-top">
+                    <div>Unadjusted Obs</div>
+                    <div class="text-xs font-normal text-slate-400 mt-0.5">($N$)</div>
+                  </th>
+                  <th class="py-2 px-3 align-top">
+                    <div>Clustered Obs</div>
+                    <div class="text-xs font-normal text-slate-400 mt-0.5">($N_{final}$)</div>
+                  </th>
+                  <th class="py-2 px-3 align-top">
+                    <div>Required Linked Firms</div>
+                    <div class="text-xs font-normal text-slate-400 mt-0.5">($N_i$)</div>
+                  </th>
                 </tr>
               </thead>
               <tbody id="benchmark_table" class="divide-y"></tbody>
@@ -172,6 +188,88 @@
 
       </div>
     </div>
+
+    <!-- Documentation & Interpretation Guide Section -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 lg:p-8 mt-8 space-y-8">
+      <div>
+        <h2 class="text-xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-4">Documentation & Interpretation Guide</h2>
+        <p class="text-slate-600 text-sm leading-relaxed mb-6">
+          This interactive calculator computes the statistical power constraints ("intersection penalties") associated with tracking firms over time using linked economic, energy, and environmental expenditure microdata panels. 
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+        <!-- Definitions -->
+        <div class="space-y-4">
+          <h3 class="text-base font-semibold text-slate-800">Key Abbreviations & Terms</h3>
+          <ul class="list-disc pl-5 space-y-2 text-slate-600">
+            <li><strong class="text-slate-700">TWFE (Two-Way Fixed Effects):</strong> An econometric panel model controlling for both unobserved unit-specific traits (firm fixed effects) and time-specific shocks (year fixed effects).</li>
+            <li><strong class="text-slate-700">MDE (Minimum Detectable Effect):</strong> The smallest true causal effect size ($\beta_1$) that the study is statistically powered to detect reliably without mistaking background noise for a real impact.</li>
+            <li><strong class="text-slate-700">DEFF (Design Effect):</strong> A mathematical penalty multiplier applied to the baseline sample size to account for the non-independence of observations (driven by within-firm serial correlation across panel years).</li>
+            <li><strong class="text-slate-700">Treatment Share ($p$):</strong> The proportion of firms in the sample that received the treatment (e.g., environmental expenditures). Maximum statistical power is achieved at a 50/50 split.</li>
+            <li><strong class="text-slate-700">Autocorrelation ($\rho$):</strong> The degree to which a firm's unexplained performance in one year correlates with its performance in the next. Highly sticky outcomes require higher sample sizes.</li>
+          </ul>
+        </div>
+
+        <!-- Interpreting the Results -->
+        <div class="space-y-4">
+          <h3 class="text-base font-semibold text-slate-800">Interpreting the Chart & Results</h3>
+          <p class="text-slate-600">
+            The <strong>Required Sample Size Curve</strong> plots the Target MDE on the X-axis against the Required Total Observations on the Y-axis. 
+          </p>
+          <ul class="list-disc pl-5 space-y-2 text-slate-600">
+            <li>The <strong>solid blue line</strong> represents the true required sample size (Clustered $N$), explicitly accounting for serial correlation.</li>
+            <li>The <strong>dashed grey line</strong> represents the theoretical baseline (Unclustered $N$) if every year for a firm was completely independent.</li>
+            <li>The vertical gap between these two lines visually demonstrates the <strong>"panel penalty"</strong>.</li>
+            <li>The curve decays exponentially: as the effect size you are trying to detect gets smaller (moving left), the required sample size explodes upward.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Sensitivity Analysis Table -->
+      <div class="mt-6">
+        <h3 class="text-base font-semibold text-slate-800 mb-3">Parameter Sensitivity: How Changing Inputs Drives the Results</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left border border-slate-200">
+            <thead class="bg-slate-50 text-slate-700 border-b">
+              <tr>
+                <th class="py-2 px-3 border-r">Parameter Adjusted</th>
+                <th class="py-2 px-3 border-r">Direction</th>
+                <th class="py-2 px-3 border-r">Impact on Required Sample Size</th>
+                <th class="py-2 px-3">Econometric Reason</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y text-slate-600">
+              <tr>
+                <td class="py-2 px-3 border-r font-medium text-slate-800">Treatment Share ($p$)</td>
+                <td class="py-2 px-3 border-r">Move further away from 50% (e.g., 10%)</td>
+                <td class="py-2 px-3 border-r font-bold text-red-600">Increases exponentially</td>
+                <td class="py-2 px-3">The variance of the treatment indicator shrinks. Imbalanced samples provide less comparative leverage between treated and untreated firms.</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 border-r font-medium text-slate-800">Variance Explained ($R^2$)</td>
+                <td class="py-2 px-3 border-r">Increase</td>
+                <td class="py-2 px-3 border-r font-bold text-emerald-600">Decreases linearly</td>
+                <td class="py-2 px-3">Better covariates/FEs absorb more background heterogeneity, lowering the residual "noise" floor and making the signal easier to detect.</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 border-r font-medium text-slate-800">Panel Horizon ($T$)</td>
+                <td class="py-2 px-3 border-r">Increase</td>
+                <td class="py-2 px-3 border-r font-semibold text-amber-600">Increases slightly</td>
+                <td class="py-2 px-3">While tracking firms longer provides more rows, the Design Effect penalty ($1 + (T-1)\rho$) inflates, offering diminishing statistical returns per year.</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-3 border-r font-medium text-slate-800">Autocorrelation ($\rho$)</td>
+                <td class="py-2 px-3 border-r">Increase</td>
+                <td class="py-2 px-3 border-r font-bold text-red-600">Increases linearly</td>
+                <td class="py-2 px-3">High stickiness means year 2 provides very little <i>new</i> information compared to year 1. More unique firms are required to compensate for redundant data.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script>
